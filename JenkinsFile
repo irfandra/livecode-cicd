@@ -40,13 +40,38 @@ pipeline {
             echo 'This will always run'
         }
         success {
-             emailext body: 'Test Message',
-                             subject: 'Test Subject',
-                             to: 'irfanrahmanindra@gmail.com'
+             def attachments = [
+                    [
+                        text: 'Congratulations! The Jenkins Pipeline succeeded.',
+                        fallback: 'Success!',
+                        color: '#00ff00'
+                    ]
+                ]
+                
+                slackSend(channel: "#general", attachments: attachments)
+             script {
+                        def buildStatus = currentBuild.result ?: 'UNKNOWN'
+                        def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
+                        def body = "The Jenkins Pipeline has completed.\n\nBuild Status: ${buildStatus}"
+                        
+                        emailext body: body,
+                                 subject: subject,
+                                 to: 'irfanrahmanindra@gmail.com'
+                        
+                    }
+                    
            
         }
         failure {
-            echo 'This will run only if failed'
+            script {
+                def buildStatus = currentBuild.result ?: 'UNKNOWN'
+                def subject = "Build ${buildStatus}: Jenkins Pipeline Failure"
+                def body = "The Jenkins Pipeline has failed.\n\nBuild Status: ${buildStatus}"
+                
+                emailext body: body,
+                         subject: subject,
+                         to: 'test@example.com'
+            }
         }
     }
 }

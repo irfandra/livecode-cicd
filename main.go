@@ -7,90 +7,93 @@ import (
 	"github.com/google/uuid"
 )
 
-type Product struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Price int32  `json:"price"`
+type Book struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Author string `json:"author"`
+	Year   int    `json:"year"`
 }
 
-var products = []Product{
-	{ID: "P001", Name: "Product A", Price: 100000},
-	{ID: "P002", Name: "Product B", Price: 200000},
-	{ID: "P003", Name: "Product C", Price: 300000},
+var books = []Book{
+	{ID: "B001", Title: "Book A", Author: "Author A", Year: 2020},
+	{ID: "B002", Title: "Book B", Author: "Author B", Year: 2021},
+	{ID: "B003", Title: "Book C", Author: "Author C", Year: 2022},
 }
 
 func HomepageHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome to Golang Simple Jenkins"})
+	c.JSON(http.StatusOK, gin.H{"message": "Welcome to Book Management"})
 }
 
-func NewProductHandler(c *gin.Context) {
-	var newProduct Product
-	if err := c.ShouldBindJSON(&newProduct); err != nil {
+func NewBookHandler(c *gin.Context) {
+	var newBook Book
+	if err := c.ShouldBindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	newProduct.ID = uuid.New().String()
-	products = append(products, newProduct)
-	c.JSON(http.StatusCreated, newProduct)
+	newBook.ID = uuid.New().String()
+	books = append(books, newBook)
+	c.JSON(http.StatusCreated, newBook)
 }
 
-func GetProductHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, products)
+func GetBooksHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, books)
 }
 
-func UpdateProductHandler(c *gin.Context) {
+func UpdateBookHandler(c *gin.Context) {
 	id := c.Param("id")
-	var product Product
-	if err := c.ShouldBindJSON(&product); err != nil {
+	var book Book
+	if err := c.ShouldBindJSON(&book); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 	index := -1
-	for i := 0; i < len(products); i++ {
-		if products[i].ID == id {
-			index = 1
+	for i := 0; i < len(books); i++ {
+		if books[i].ID == id {
+			index = i
+			break
 		}
 	}
 	if index == -1 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Product not found",
+			"error": "Book not found",
 		})
 		return
 	}
-	products[index] = product
-	c.JSON(http.StatusOK, product)
+	books[index] = book
+	c.JSON(http.StatusOK, book)
 }
 
-func DeleteProductHandler(c *gin.Context) {
+func DeleteBookHandler(c *gin.Context) {
 	id := c.Param("id")
 	index := -1
-	for i := 0; i < len(products); i++ {
-		if products[i].ID == id {
-			index = 1
+	for i := 0; i < len(books); i++ {
+		if books[i].ID == id {
+			index = i
+			break
 		}
 	}
 	if index == -1 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Product not found",
+			"error": "Book not found",
 		})
 		return
 	}
-	products = append(products[:index], products[index+1:]...)
+	books = append(books[:index], books[index+1:]...)
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Producr has been deleted",
+		"message": "Book has been deleted",
 	})
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/", HomepageHandler)
-	router.GET("/products", GetProductHandler)
-	router.POST("/products", NewProductHandler)
-	router.PUT("/products/:id", UpdateProductHandler)
-	router.DELETE("/products/:id", DeleteProductHandler)
+	router.GET("/books", GetBooksHandler)
+	router.POST("/books", NewBookHandler)
+	router.PUT("/books/:id", UpdateBookHandler)
+	router.DELETE("/books/:id", DeleteBookHandler)
 	router.Run(":8888")
 }

@@ -40,7 +40,7 @@ pipeline {
             echo 'This will always run'
         }
         success {
-            echo 'This will run only if successful',
+        
             emailext(
                         subject: "Jenkins Pipeline Notification",
                         body: "The Jenkins Pipeline has completed.",

@@ -40,7 +40,11 @@ pipeline {
             echo 'This will always run'
         }
         success {
-            echo 'This will run only if successful'
+            mail to: "naivetechblog@gmail.com",
+            subject: "Test Email",
+            body: "Test",
+            echo 'This will run only if successful',
+           
         }
         failure {
             echo 'This will run only if failed'

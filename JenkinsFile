@@ -40,14 +40,10 @@ pipeline {
             echo 'This will always run'
         }
         success {
-        
-            emailext(
-                        subject: "Jenkins Pipeline Notification",
-                        body: "The Jenkins Pipeline has completed.",
-                        recipientProviders: [[$class: 'EditableEmailRecipientProvider', 
-                                            recipientList: 'irfanrahmanindra@gmail.com']],
-                        attachmentsPattern: '**/*'
-                    )
+             emailext body: 'Test Message',
+                             subject: 'Test Subject',
+                             to: 'irfanrahmanindra@gmail.com'
+           
         }
         failure {
             echo 'This will run only if failed'

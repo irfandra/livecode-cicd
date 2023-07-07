@@ -73,7 +73,7 @@ pipeline {
                 
                 def attachments = [
                     [
-                        text: "Oops! The Jenkins for ${env.JOB_NAME} Pipeline failed..",
+                        text: "Oops! The Jenkins for ${env.JOB_NAME} Pipeline failed.",
                         fallback: 'Failure!',
                         color: '#ff0000'
                     ]

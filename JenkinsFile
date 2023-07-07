@@ -40,7 +40,16 @@ pipeline {
             echo 'This will always run'
         }
         success {
-             def attachments = [
+            script {
+                def buildStatus = currentBuild.result ?: 'UNKNOWN'
+                def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
+                def body = "The Jenkins Pipeline has completed.\n\nBuild Status: ${buildStatus}"
+                
+                emailext body: body,
+                         subject: subject,
+                         to: 'irfanrahmanindra@gmail.com'
+                
+                def attachments = [
                     [
                         text: 'Congratulations! The Jenkins Pipeline succeeded.',
                         fallback: 'Success!',
@@ -48,29 +57,29 @@ pipeline {
                     ]
                 ]
                 
-                slackSend(channel: "#general", attachments: attachments)
-             script {
-                        def buildStatus = currentBuild.result ?: 'UNKNOWN'
-                        def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
-                        def body = "The Jenkins Pipeline has completed.\n\nBuild Status: ${buildStatus}"
-                        
-                        emailext body: body,
-                                 subject: subject,
-                                 to: 'irfanrahmanindra@gmail.com'
-                        
-                    }
-                    
-           
+                slackSend(channel: "D05FAGS6ADD", attachments: attachments)
+            }
         }
+        
         failure {
             script {
                 def buildStatus = currentBuild.result ?: 'UNKNOWN'
-                def subject = "Build ${buildStatus}: Jenkins Pipeline Failure"
+                def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
                 def body = "The Jenkins Pipeline has failed.\n\nBuild Status: ${buildStatus}"
                 
                 emailext body: body,
                          subject: subject,
-                         to: 'test@example.com'
+                         to: 'irfanrahmanindra@gmail.com'
+                
+                def attachments = [
+                    [
+                        text: 'Oops! The Jenkins Pipeline failed.',
+                        fallback: 'Failure!',
+                        color: '#ff0000'
+                    ]
+                ]
+                
+                slackSend(channel: "D05FAGS6ADD", attachments: attachments)
             }
         }
     }

@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        GIT_URL = 'https://github.com/irfandra/job-with-git.git'
+        GIT_URL = 'https://github.com/irfandra/livecode-cicd.git'
         BRANCH = 'tes-pipeline'
         IMAGE = 'my-golang-test'
         CONTAINER = 'my-golang-test-app'

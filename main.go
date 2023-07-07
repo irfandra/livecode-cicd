@@ -2,26 +2,32 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type Book struct {
-	ID     string `json:"id"`
+	ID     uint32 `json:"id"`
 	Title  string `json:"title"`
 	Author string `json:"author"`
 	Year   int    `json:"year"`
 }
 
-var books = []Book{
-	{ID: "B001", Title: "Book A", Author: "Author A", Year: 2020},
-	{ID: "B002", Title: "Book B", Author: "Author B", Year: 2021},
-	{ID: "B003", Title: "Book C", Author: "Author C", Year: 2022},
-}
+var books = []Book{}
 
 func HomepageHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Welcome to Book Management"})
+}
+
+func InitializeHandler(c *gin.Context) {
+	books = []Book{
+		{ID: 1, Title: "Book A", Author: "Author A", Year: 2020},
+		{ID: 2, Title: "Book B", Author: "Author B", Year: 2021},
+		{ID: 3, Title: "Book C", Author: "Author C", Year: 2022},
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Books initialized"})
 }
 
 func NewBookHandler(c *gin.Context) {
@@ -32,7 +38,7 @@ func NewBookHandler(c *gin.Context) {
 		})
 		return
 	}
-	newBook.ID = uuid.New().String()
+	newBook.ID = uuid.New().ID()
 	books = append(books, newBook)
 	c.JSON(http.StatusCreated, newBook)
 }
@@ -42,7 +48,14 @@ func GetBooksHandler(c *gin.Context) {
 }
 
 func UpdateBookHandler(c *gin.Context) {
-	id := c.Param("id")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid ID format",
+		})
+		return
+	}
+
 	var book Book
 	if err := c.ShouldBindJSON(&book); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -50,47 +63,59 @@ func UpdateBookHandler(c *gin.Context) {
 		})
 		return
 	}
-	index := -1
+
+	updated := false
 	for i := 0; i < len(books); i++ {
-		if books[i].ID == id {
-			index = i
+		if books[i].ID == uint32(id) {
+			book.ID = uint32(id)
+			books[i] = book
+			updated = true
 			break
 		}
 	}
-	if index == -1 {
+
+	if updated {
+		c.JSON(http.StatusOK, book)
+	} else {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Book not found",
 		})
-		return
 	}
-	books[index] = book
-	c.JSON(http.StatusOK, book)
 }
 
 func DeleteBookHandler(c *gin.Context) {
-	id := c.Param("id")
-	index := -1
-	for i := 0; i < len(books); i++ {
-		if books[i].ID == id {
-			index = i
-			break
-		}
-	}
-	if index == -1 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Book not found",
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid ID format",
 		})
 		return
 	}
-	books = append(books[:index], books[index+1:]...)
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Book has been deleted",
-	})
+
+	deleted := false
+	for i := 0; i < len(books); i++ {
+		if books[i].ID == uint32(id) {
+			books = append(books[:i], books[i+1:]...)
+			deleted = true
+			break
+		}
+	}
+
+	if deleted {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Book has been deleted",
+		})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Book not found",
+		})
+	}
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/", HomepageHandler)
+	router.GET("/init", InitializeHandler)
 	router.GET("/books", GetBooksHandler)
 	router.POST("/books", NewBookHandler)
 	router.PUT("/books/:id", UpdateBookHandler)

@@ -43,7 +43,7 @@ pipeline {
             script {
                 def buildStatus = currentBuild.result ?: 'UNKNOWN'
                 def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
-                def body = "The Jenkins Pipeline has completed.\n\nBuild Status: ${buildStatus}"
+                def body = "The Jenkins Pipeline for ${env.JOB_NAME} has completed.\n\nBuild Status: ${buildStatus}"
                 
                 emailext body: body,
                          subject: subject,
@@ -51,7 +51,7 @@ pipeline {
                 
                 def attachments = [
                     [
-                        text: 'Congratulations! The Jenkins Pipeline succeeded.',
+                        text: "Congratulations! The Jenkins Pipeline for ${env.JOB_NAME} succeeded.",
                         fallback: 'Success!',
                         color: '#00ff00'
                     ]
@@ -65,7 +65,7 @@ pipeline {
             script {
                 def buildStatus = currentBuild.result ?: 'UNKNOWN'
                 def subject = "Build ${buildStatus}: Jenkins Pipeline Notification"
-                def body = "The Jenkins Pipeline has failed.\n\nBuild Status: ${buildStatus}"
+                def body = "The Jenkins Pipeline for ${env.JOB_NAME} has failed.\n\nBuild Status: ${buildStatus}"
                 
                 emailext body: body,
                          subject: subject,
@@ -73,7 +73,7 @@ pipeline {
                 
                 def attachments = [
                     [
-                        text: 'Oops! The Jenkins Pipeline failed.',
+                        text: "Oops! The Jenkins for ${env.JOB_NAME} Pipeline failed.",
                         fallback: 'Failure!',
                         color: '#ff0000'
                     ]

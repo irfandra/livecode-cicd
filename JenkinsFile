@@ -10,7 +10,7 @@ pipeline {
         DB_USER = 'postgres'
         DB_NAME = 'postgres'
         DB_PASSWORD = 'password'
-        DB_PORT = '5432'
+        DB_PORT = '5555'
         API_PORT = '8000'
     }
     stages {

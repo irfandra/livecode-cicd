@@ -24,7 +24,7 @@ services:
       - POSTGRES_PASSWORD=password
     restart: always
     ports:
-      - ${DB_PORT}:5432
+      - ${DB_PORT}:5555
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
